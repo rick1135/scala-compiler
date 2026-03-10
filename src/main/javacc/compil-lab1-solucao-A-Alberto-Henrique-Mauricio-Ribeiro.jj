@@ -121,3 +121,13 @@ TOKEN : {
     |
     < KW_YIELD: "yield" >
 }
+
+//identificadores, começa com letra e seguido de letras ou números
+TOKEN : {
+    < ID: "_" (["a"-"z", "A"-"Z", "0"-"9", "_"])+
+    |
+    ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*
+    |
+    "`" (~["`"])+ "`" >
+}
+
