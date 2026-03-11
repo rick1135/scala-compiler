@@ -20,13 +20,46 @@ public class AnalisadorLexico {
     }
 
     static String obterNomeClasse(int kind) {
-        switch(kind) {
-            case ID: return "ID";
-            case NUM_INT: return "NUM_INT";
-            case PALAVRA_CHAVE: return "PALAVRA_CHAVE";
-            default: return "DESCONHECIDO";
+            switch(kind) {
+                case ID: return "ID";
+                case KW_UNDER: return "KW_UNDER";
+                case NUM_INT: return "NUM_INT";
+                case NUM_DEC: return "NUM_DEC";
+                case NUM_HEX: return "NUM_HEX";
+                case NUM_LONG: return "NUM_LONG";
+                case STRING: return "STRING";
+                case STRING_MULTILINHA: return "STRING_MULTILINHA";
+                case CHAR: return "CHAR";
+                case SYMBOL: return "SYMBOL";
+                case OP_MATEMATICO: return "OP_MATEMATICO";
+                case OP_RELACIONAL: return "OP_RELACIONAL";
+                case OP_LOGICO: return "OP_LOGICO";
+                case OP_ATRIBUICAO: return "OP_ATRIBUICAO";
+                case OP_BITWISE: return "OP_BITWISE";
+                case OP_CUSTOMIZADO: return "OP_CUSTOMIZADO";
+                case OP_SETA_DIREITA: return "OP_SETA_DIREITA";
+                case OP_SETA_ESQUERDA: return "OP_SETA_ESQUERDA";
+                case OP_LIMITE_SUPERIOR: return "OP_LIMITE_SUPERIOR";
+                case OP_LIMITE_INFERIOR: return "OP_LIMITE_INFERIOR";
+                case OP_VIEW_BOUND: return "OP_VIEW_BOUND";
+                case DELIMITADOR: return "DELIMITADOR";
+
+                //agrupando as palavras chave
+                case KW_ABSTRACT: case KW_CASE: case KW_CATCH: case KW_CLASS:
+                case KW_DEF: case KW_DO: case KW_ELSE: case KW_EXTENDS:
+                case KW_FALSE: case KW_FINAL: case KW_FINALLY: case KW_FOR:
+                case KW_FORSOME: case KW_IF: case KW_IMPLICIT: case KW_IMPORT:
+                case KW_LAZY: case KW_MACRO: case KW_MATCH: case KW_NEW:
+                case KW_NULL: case KW_OBJECT: case KW_OVERRIDE: case KW_PACKAGE:
+                case KW_PRIVATE: case KW_PROTECTED: case KW_RETURN: case KW_SEALED:
+                case KW_SUPER: case KW_THIS: case KW_THROW: case KW_TRAIT:
+                case KW_TRY: case KW_TRUE: case KW_TYPE: case KW_VAL:
+                case KW_VAR: case KW_WHILE: case KW_WITH: case KW_YIELD:
+                    return "PALAVRA_CHAVE";
+
+                default: return "DESCONHECIDO";
+            }
         }
-    }
 }
 PARSER_END(AnalisadorLexico)
 
@@ -128,12 +161,20 @@ TOKEN : {
 
 //simbolos que são tratados como palavras reservadas
 TOKEN : {
-    < KW_SYMBOLS: "_" | ":" | "<-" | "#" | "@" | "=>" | "<:" | ">:" | "<%" >
+    < OP_SETA_DIREITA: "=>" >
+    |
+    < OP_SETA_ESQUERDA: "<-" >
+    |
+    < OP_LIMITE_SUPERIOR: "<:" >
+    |
+    < OP_LIMITE_INFERIOR: ">:" >
+    |
+    < OP_VIEW_BOUND: "<%" >
 }
 
 //identificadores, começa com letra e seguido de letras ou números
 TOKEN : {
-    < KW_UNDERSCORE: "_" >
+    < KW_UNDER: "_" >
     |
     < ID: "_" (["a"-"z", "A"-"Z", "0"-"9", "_"])+
             | ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*
@@ -142,22 +183,22 @@ TOKEN : {
 
 //operadores
 TOKEN : {
-    < OP_MATEMATICO: "+" | "-" | "*" | "/" | "%" >
+    < OP_RELACIONAL: "==" | "!=" | "<=" | ">=" | "<" | ">" >
     |
-    < OP_RELACIONAL: "==" | "!=" | "<" | ">" | "<=" | ">=" >
+    < OP_ATRIBUICAO: "+=" | "-=" | "*=" | "/=" | "=" >
+    |
+    < OP_BITWISE: "<<" | ">>>" | ">>" | "&" | "|" | "^" | "~" >
     |
     < OP_LOGICO: "&&" | "||" | "!" >
     |
-    < OP_ATRIBUICAO: "=" | "+=" | "-=" | "*=" | "/=" >
-    |
-    < OP_BITWISE: "&" | "|" | "^" | "~" | "<<" | ">>" | ">>>" >
+    < OP_MATEMATICO: "+" | "-" | "*" | "/" | "%" >
     |
     < OP_CUSTOMIZADO: "?" | "\\" >
 }
 
 //delimitadores
 TOKEN : {
-    < DELIMITADOR: "(" | ")" | "{" | "}" | "[" | "]" | ";" | "," | "." | "`" >
+    < DELIMITADOR: "(" | ")" | "{" | "}" | "[" | "]" | ";" | "," | "." | "#" | "@" | ":" >
 }
 
 //números
@@ -168,8 +209,13 @@ TOKEN : {
     |
     < NUM_INT: (["0"-"9"])+ >
     |
-    < NUM_DEC: (["0"-"9"])+ "." (["0"-"9"])* (["e", "E"] (["+", "-"])? (["0"-"9"])+)?
-        | "." (["0"-"9"])+ (["e", "E"] (["+", "-"])? (["0"-"9"])+)?
+    < NUM_DEC: (["0"-"9"])+ "." (["0"-"9"])* (["e", "E"] (["+", "-"])? (["0"-"9"])+)? (["f", "F", "d", "D"])?
+        |
+        "." (["0"-"9"])+ (["e", "E"] (["+", "-"])? (["0"-"9"])+)? (["f", "F", "d", "D"])?
+        |
+        (["0"-"9"])+ ["e", "E"] (["+", "-"])? (["0"-"9"])+ (["f", "F", "d", "D"])?
+        |
+        (["0"-"9"])+ ["f", "F", "d", "D"]
     >
 }
 
@@ -181,5 +227,8 @@ TOKEN : {
 }
 
 TOKEN : {
-    < CHAR: "'" ( ~["'", "\n", "\r", "\\"] | "\\" ~[]) "'" >
+    < CHAR: "'" ( ~["'", "\n", "\r", "\\"] | "\\" ~[] ) "'" >
+    |
+    < SYMBOL: "'" ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* >
 }
+
