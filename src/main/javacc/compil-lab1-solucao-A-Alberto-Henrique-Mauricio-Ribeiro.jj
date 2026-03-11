@@ -133,11 +133,11 @@ TOKEN : {
 
 //identificadores, começa com letra e seguido de letras ou números
 TOKEN : {
+    < KW_UNDERSCORE: "_" >
+    |
     < ID: "_" (["a"-"z", "A"-"Z", "0"-"9", "_"])+
-    |
-    ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*
-    |
-    "`" (~["`"])+ "`" >
+            | ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*
+            | "`" (~["`"])+ "`" >
 }
 
 //operadores
