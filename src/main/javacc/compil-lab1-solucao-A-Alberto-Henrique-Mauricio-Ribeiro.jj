@@ -37,6 +37,10 @@ PARSER_END(AnalisadorLexico)
 //caracteres que devem ser ignorados (espaços, quebras de linha)
 SKIP : {
     " " | "\t" | "\n" | "\r"
+    |
+    < COMENTARIO_LINHA_UNICA: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")? >
+    |
+    < COMENTARIO_MULTILINHA: "/*" (~["*"] | "*" ~["/"])* "*" "/" >
 }
 
 //palavras chave do scala
@@ -167,4 +171,8 @@ TOKEN : {
 //strings
 TOKEN : {
     < STRING: "\"" ( ~["\"", "\n", "\r"] )* "\"" >
+}
+
+TOKEN : {
+    < CHAR: "'" ( ~["'", "\n", "\r", "\\"] | "\\" ~[]) "'" >
 }
