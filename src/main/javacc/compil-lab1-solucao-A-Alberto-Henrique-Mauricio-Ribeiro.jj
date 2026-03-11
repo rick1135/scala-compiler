@@ -43,7 +43,7 @@ SKIP : {
     < COMENTARIO_MULTILINHA: "/*" (~["*"] | "*" ~["/"])* "*" "/" >
 }
 
-//palavras chave do scala
+//palavras reservadas do scala
 TOKEN : {
     < KW_ABSTRACT: "abstract" >
     |
@@ -126,6 +126,11 @@ TOKEN : {
     < KW_YIELD: "yield" >
 }
 
+//simbolos que são tratados como palavras reservadas
+TOKEN : {
+    < KW_SYMBOLS: "_" | ":" | "<-" | "#" | "@" | "=>" | "<:" | ">:" | "<%" >
+}
+
 //identificadores, começa com letra e seguido de letras ou números
 TOKEN : {
     < ID: "_" (["a"-"z", "A"-"Z", "0"-"9", "_"])+
@@ -145,18 +150,14 @@ TOKEN : {
     |
     < OP_ATRIBUICAO: "=" | "+=" | "-=" | "*=" | "/=" >
     |
-    < OP_TIPO: "=>" | "<:" | ">:" | "<%" >
-    |
     < OP_BITWISE: "&" | "|" | "^" | "~" | "<<" | ">>" | ">>>" >
-    |
-    < OP_GERADOR: "<-" >
     |
     < OP_CUSTOMIZADO: "?" | "\\" >
 }
 
 //delimitadores
 TOKEN : {
-    < DELIMITADOR: "(" | ")" | "{" | "}" | "[" | "]" | ";" | "," | "." | ":" | "#" | "@" | "_" | "`" >
+    < DELIMITADOR: "(" | ")" | "{" | "}" | "[" | "]" | ";" | "," | "." | "`" >
 }
 
 //números
