@@ -1,0 +1,211 @@
+PARSER_BEGIN(AnalisadorLexicoLab2)
+
+import java.io.*;
+
+public class AnalisadorLexicoLab2 {
+    public static void main(String[] args) {
+        String nomeArquivo = args.length > 0
+            ? args[0]
+            : "compil-lab1-amostra-B-Alberto-Henrique-Mauricio-Ribeiro.scala";
+
+        try (FileInputStream fis = new FileInputStream(nomeArquivo)) {
+            AnalisadorLexicoLab2 lexer = new AnalisadorLexicoLab2(fis);
+            Token t;
+
+            while ((t = lexer.getNextToken()).kind != EOF) {
+                System.out.println(obterTerminalSintatico(t.kind) + " " + t.image);
+            }
+            // O parserLR fornecido consome o fim de entrada como terminal "$".
+            System.out.println("$ ");
+        } catch (FileNotFoundException e) {
+            System.out.println("Arquivo não encontrado: " + nomeArquivo);
+        } catch (IOException e) {
+            System.out.println("Falha ao abrir arquivo: " + nomeArquivo);
+        }
+    }
+
+    static String obterTerminalSintatico(int kind) {
+        switch (kind) {
+            case ID: return "ID";
+            case NUM_INT: return "NUM_INT";
+            case NUM_DEC: return "NUM_DEC";
+            case NUM_HEX: return "NUM_HEX";
+            case NUM_LONG: return "NUM_LONG";
+            case STRING: return "STRING";
+            case STRING_MULTILINHA: return "STRING_MULTILINHA";
+            case CHAR: return "CHAR";
+            case SYMBOL: return "SYMBOL";
+
+            case KW_CASE: return "CASE";
+            case KW_CLASS: return "CLASS";
+            case KW_DEF: return "DEF";
+            case KW_ELSE: return "ELSE";
+            case KW_FALSE: return "FALSE";
+            case KW_IF: return "IF";
+            case KW_NEW: return "NEW";
+            case KW_RETURN: return "RETURN";
+            case KW_TRUE: return "TRUE";
+            case KW_VAR: return "VAR";
+            case KW_WHILE: return "WHILE";
+
+            case ADD_ASSIGN: return "ADD_ASSIGN";
+            case ASSIGN: return "ASSIGN";
+            case SUB_ASSIGN: return "SUB_ASSIGN";
+
+            case AND_AND: return "AND";
+            case BANG: return "NOT";
+            case EQ_EQ: return "EQ";
+            case GT: return "GT";
+            case GTE: return "GE";
+            case LT: return "LT";
+            case LTE: return "LE";
+            case NEQ: return "NE";
+            case OR_OR: return "OR";
+
+            case MINUS: return "MINUS";
+            case PERCENT: return "PERCENT";
+            case PLUS: return "PLUS";
+            case SLASH: return "SLASH";
+            case STAR: return "STAR";
+
+            case COLON: return "COLON";
+            case COMMA: return "COMMA";
+            case DOT: return "DOT";
+            case LBRACE: return "LBRACE";
+            case LBRACKET: return "LBRACKET";
+            case LPAREN: return "LPAREN";
+            case RBRACE: return "RBRACE";
+            case RBRACKET: return "RBRACKET";
+            case RPAREN: return "RPAREN";
+            case SEMI: return "SEMI";
+
+            default: return "DESCONHECIDO";
+        }
+    }
+}
+PARSER_END(AnalisadorLexicoLab2)
+
+SKIP : {
+    " " | "\t" | "\n" | "\r"
+    |
+    < COMENTARIO_LINHA_UNICA: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")? >
+    |
+    < COMENTARIO_MULTILINHA: "/*" (~["*"] | "*" ~["/"])* "*" "/" >
+}
+
+TOKEN : {
+    < KW_CASE: "case" >
+    |
+    < KW_CLASS: "class" >
+    |
+    < KW_DEF: "def" >
+    |
+    < KW_ELSE: "else" >
+    |
+    < KW_FALSE: "false" >
+    |
+    < KW_IF: "if" >
+    |
+    < KW_NEW: "new" >
+    |
+    < KW_RETURN: "return" >
+    |
+    < KW_TRUE: "true" >
+    |
+    < KW_VAR: "var" >
+    |
+    < KW_WHILE: "while" >
+}
+
+TOKEN : {
+    < ID: "_" (["a"-"z", "A"-"Z", "0"-"9", "_"])+
+        | ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*
+        | "`" (~["`"])+ "`" >
+}
+
+TOKEN : {
+    < ADD_ASSIGN: "+=" >
+    |
+    < SUB_ASSIGN: "-=" >
+    |
+    < EQ_EQ: "==" >
+    |
+    < NEQ: "!=" >
+    |
+    < LTE: "<=" >
+    |
+    < GTE: ">=" >
+    |
+    < AND_AND: "&&" >
+    |
+    < OR_OR: "||" >
+    |
+    < ASSIGN: "=" >
+    |
+    < LT: "<" >
+    |
+    < GT: ">" >
+    |
+    < BANG: "!" >
+    |
+    < PLUS: "+" >
+    |
+    < MINUS: "-" >
+    |
+    < STAR: "*" >
+    |
+    < SLASH: "/" >
+    |
+    < PERCENT: "%" >
+}
+
+TOKEN : {
+    < LPAREN: "(" >
+    |
+    < RPAREN: ")" >
+    |
+    < LBRACE: "{" >
+    |
+    < RBRACE: "}" >
+    |
+    < LBRACKET: "[" >
+    |
+    < RBRACKET: "]" >
+    |
+    < SEMI: ";" >
+    |
+    < COMMA: "," >
+    |
+    < DOT: "." >
+    |
+    < COLON: ":" >
+}
+
+TOKEN : {
+    < NUM_HEX: "0" ("x" | "X") (["0"-"9", "a"-"f", "A"-"F"])+ (["l", "L"])? >
+    |
+    < NUM_LONG: (["0"-"9"])+ (["l", "L"]) >
+    |
+    < NUM_INT: (["0"-"9"])+ >
+    |
+    < NUM_DEC: (["0"-"9"])+ "." (["0"-"9"])* (["e", "E"] (["+", "-"])? (["0"-"9"])+)? (["f", "F", "d", "D"])?
+        |
+        "." (["0"-"9"])+ (["e", "E"] (["+", "-"])? (["0"-"9"])+)? (["f", "F", "d", "D"])?
+        |
+        (["0"-"9"])+ ["e", "E"] (["+", "-"])? (["0"-"9"])+ (["f", "F", "d", "D"])?
+        |
+        (["0"-"9"])+ ["f", "F", "d", "D"]
+    >
+}
+
+TOKEN : {
+    < STRING_MULTILINHA: "\"\"\"" (~["\""] | "\"" ~["\""] | "\"\"" ~["\""])* "\"\"\"" >
+    |
+    < STRING: "\"" (~["\"", "\n", "\r", "\\"] | "\\" ~[])* "\"" >
+}
+
+TOKEN : {
+    < CHAR: "'" ( ~["'", "\n", "\r", "\\"] | "\\" ~[] ) "'" >
+    |
+    < SYMBOL: "'" ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* >
+}
